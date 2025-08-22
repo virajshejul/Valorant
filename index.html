@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALORANT - A 5v5 character-based tactical FPS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0f1419;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #ff4655;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff4655;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            text-shadow: 0 0 20px #ff4655;
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ff4655;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #ff4655;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #ff4655, #ff6b7a);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 70, 85, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f1419 0%, #1e2328 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ff4655" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(10px) translateY(10px); }
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #ff4655);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-text .subtitle {
+            font-size: 1.5rem;
+            color: #a0a0a0;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #ccc;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff4655, #ff6b7a);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            padding: 16px 32px;
+            border: 2px solid #ff4655;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 70, 85, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: #ff4655;
+        }
+
+        .hero-visual {
+            position: relative;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .agent-card {
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(135deg, #1e2328, #2a2f36);
+            border-radius: 20px;
+            border: 2px solid #ff4655;
+            position: relative;
+            overflow: hidden;
+            transform: rotateY(-10deg);
+            animation: float 6s ease-in-out infinite, fadeInRight 1s ease;
+            box-shadow: 0 20px 60px rgba(255, 70, 85, 0.3);
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(255, 70, 85, 0.1) 50%, transparent 51%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        .agent-avatar {
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(135deg, #ff4655, #ff6b7a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            color: white;
+            position: relative;
+        }
+
+        .agent-info {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .agent-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff4655;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-role {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: rotateY(-10deg) translateY(0px); }
+            50% { transform: rotateY(-10deg) translateY(-20px); }
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px) rotateY(-10deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) rotateY(-10deg);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, #1e2328, #0f1419);
+            position: relative;
+        }
+
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 4rem;
+            background: linear-gradient(135deg, #fff, #ff4655);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #1e2328, #2a2f36);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 70, 85, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff4655, #ff6b7a);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(255, 70, 85, 0.2);
+            border-color: #ff4655;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff4655, #ff6b7a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .feature-card p {
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+
+        /* Agents Section */
+        .agents {
+            padding: 8rem 2rem;
+            background: #0f1419;
+        }
+
+        .agents-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .agents h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 4rem;
+            background: linear-gradient(135deg, #fff, #ff4655);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .agent-item {
+            background: linear-gradient(135deg, #1e2328, #2a2f36);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .agent-item:hover {
+            transform: translateY(-10px);
+            border-color: #ff4655;
+            box-shadow: 0 20px 60px rgba(255, 70, 85, 0.3);
+        }
+
+        .agent-image {
+            height: 200px;
+            background: linear-gradient(135deg, #ff4655, #ff6b7a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+
+        .agent-details {
+            padding: 1.5rem;
+        }
+
+        .agent-details h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #ff4655;
+        }
+
+        .agent-details p {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #1e2328, #0f1419);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(255, 70, 85, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ff4655;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section a {
+            color: #a0a0a0;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ff4655;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 70, 85, 0.1);
+            color: #666;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-visual {
+                height: 400px;
+            }
+
+            .agent-card {
+                width: 250px;
+                height: 350px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .features h2,
+            .agents h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Scroll animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Loading screen */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f1419;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255, 70, 85, 0.3);
+            border-top: 3px solid #ff4655;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">VALORANT</div>
+            <ul class="nav-links">
+                <li><a href="#home">Game</a></li>
+                <li><a href="#agents">Agents</a></li>
+                <li><a href="#arsenal">Arsenal</a></li>
+                <li><a href="#esports">Esports</a></li>
+                <li><a href="#news">News</a></li>
+            </ul>
+            <button class="play-btn" onclick="playGame()">Play Free Now</button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>DEFY THE LIMITS</h1>
+                <div class="subtitle">Blend your style and experience on a global, competitive stage.</div>
+                <p>You have 13 rounds to attack and defend your side using sharp gunplay and tactical abilities. And, with one life per-round, you'll need to think faster than your opponent if you want to survive.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="playGame()">Play Free Now</button>
+                    <button class="btn-secondary" onclick="watchTrailer()">Watch Trailer</button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="agent-card">
+                    <div class="agent-avatar">🎯</div>
+                    <div class="agent-info">
+                        <div class="agent-name">JETT</div>
+                        <div class="agent-role">Duelist</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features animate-on-scroll">
+        <div class="features-container">
+            <h2>Your Fight, Your Way</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Tactical FPS</h3>
+                    <p>Precise gunplay meets unique agent abilities, resulting in intense tactical gameplay that rewards both sharp shooting and strategic thinking.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔥</div>
+                    <h3>Unique Agents</h3>
+                    <p>Choose from a diverse cast of agents, each with distinct abilities that provide countless strategic approaches to every map.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Competitive Play</h3>
+                    <p>Climb the ranks in our competitive mode, or jump into unrated games to practice your skills and try new strategies.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3>128-Tick Servers</h3>
+                    <p>Experience the highest fidelity gameplay with our custom-built 128-tick servers for maximum responsiveness and precision.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agents Section -->
+    <section class="agents animate-on-scroll" id="agents">
+        <div class="agents-container">
+            <h2>Choose Your Agent</h2>
+            <div class="agents-grid">
+                <div class="agent-item" onclick="selectAgent('Jett')">
+                    <div class="agent-image">🎯</div>
+                    <div class="agent-details">
+                        <h3>Jett</h3>
+                        <p>Duelist - Swift and lethal, Jett's abilities allow for aggressive plays and quick escapes.</p>
+                    </div>
+                </div>
+                <div class="agent-item" onclick="selectAgent('Phoenix')">
+                    <div class="agent-image">🔥</div>
+                    <div class="agent-details">
+                        <h3>Phoenix</h3>
+                        <p>Duelist - Phoenix's fire abilities heal him and harm enemies, perfect for self-sufficient plays.</p>
+                    </div>
+                </div>
+                <div class="agent-item" onclick="selectAgent('Sage')">
+                    <div class="agent-image">⚕️</div>
+                    <div class="agent-details">
+                        <h3>Sage</h3>
+                        <p>Sentinel - The team's anchor, Sage heals allies and controls areas with her utility.</p>
+                    </div>
+                </div>
+                <div class="agent-item" onclick="selectAgent('Sova')">
+                    <div class="agent-image">🏹</div>
+                    <div class="agent-details">
+                        <h3>Sova</h3>
+                        <p>Initiator - Master tracker who reveals enemy positions with his recon abilities.</p>
+                    </div>
+                </div>
+                <div class="agent-item" onclick="selectAgent('Brimstone')">
+                    <div class="agent-image">💨</div>
+                    <div class="agent-details">
+                        <h3>Brimstone</h3>
+                        <p>Controller - Tactical leader who uses smokes and support abilities to control the battlefield.</p>
+                    </div>
+                </div>
+                <div class="agent-item" onclick="selectAgent('Viper')">
+                    <div class="agent-image">☠️</div>
+                    <div class="agent-details">
+                        <h3>Viper</h3>
+                        <p>Controller - Uses toxic chemicals to control territory and weaken enemies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Game</h3>
+                <a href="#download">Download</a>
+                <a href="#system-requirements">System Requirements</a>
+                <a href="#release-notes">Release Notes</a>
+                <a href="#game-guide">Game Guide</a>
+            </div>
+            <div class="footer-section">
+                <h3>Community</h3>
+                <a href="#discord">Discord</a>
+                <a href="#reddit">Reddit</a>
+                <a href="#twitter">Twitter</a>
+                <a href="#youtube">YouTube</a>
+            </div>
+            <div class="footer-section">
+                <h3>Esports</h3>
+                <a href="#vct">VCT</a>
+                <a href="#champions">Champions</a>
+                <a href="#teams">Teams</a>
+                <a href="#schedule">Schedule</a>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <a href="#help">Help Center</a>
+                <a href="#contact">Contact Us</a>
+                <a href="#bug-report">Bug Report</a>
+                <a href="#feedback">Feedback</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Riot Games, Inc. All Rights Reserved. This is a demo recreation.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Loading screen
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Header background on scroll
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(15, 20, 25, 0.98)';
+            } else {
+                header.style.background = 'rgba(15, 20, 25, 0.95)';
+            }
+        });
+
+        // Interactive functions
+        function playGame() {
+            const messages = [
+                "🎮 Redirecting to Riot Client...",
+                "⚡ Preparing your tactical experience...",
+                "🔥 Time to show your skills!",
+                "🎯 Ready to defy the limits?"
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            alert(randomMessage);
+            
+            // Add some visual feedback
+            const btn = event.target;
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        function watchTrailer() {
+            alert("🎬 Opening VALORANT trailer... Get ready for an epic preview!");
+        }
+
+        function selectAgent(agentName) {
+            const agentMessages = {
+                'Jett': "💨 You've selected Jett! Time to dash into action with lightning speed!",
+                'Phoenix': "🔥 Phoenix chosen! Light up the battlefield with your fiery abilities!",
+                'Sage': "⚕️ Sage selected! Keep your team alive and control the battlefield!",
+                'Sova': "🏹 Sova ready! Hunt down enemies with your tracking abilities!",
+                'Brimstone': "💨 Brimstone locked in! Command the battlefield from above!",
+                'Viper': "☠️ Viper chosen! Poison the competition with toxic tactics!"
+            };
+            
+            alert(agentMessages[agentName] || `${agentName} selected! Ready for battle!`);
+            
+            // Add selection effect
+            const agentCards = document.querySelectorAll('.agent-item');
+            agentCards.forEach(card => {
+                card.style.transform = 'scale(1)';
+                card.style.borderColor = 'transparent';
+            });
+            
+            event.currentTarget.style.transform = 'scale(1.05)';
+            event.currentTarget.style.borderColor = '#ff4655';
+            
+            setTimeout(() => {
+                event.currentTarget.style.transform = 'scale(1)';
+            }, 300);
+        }
+
+        // Add particle effect on mouse move
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() > 0.95) {
+                createParticle(e.clientX, e.clientY);
+            }
+        });
+
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed;
+                width: 4px;
+                height: 4px;
+                background: #ff4655;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                left: ${x}px;
+                top: ${y}px;
+                animation: particleFade 1s ease-out forwards;
+            `;
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 1000);
+        }
+
+        // Add CSS for particle animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes particleFade {
+                0% {
+                    opacity: 1;
+                    transform: scale(1) translate(0, 0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(0) translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Dynamic background particles
+        function createBackgroundParticles() {
+            const container = document.querySelector('.hero');
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `
+                        position: absolute;
+                        width: 2px;
+                        height: 2px;
+                        background: rgba(255, 70, 85, 0.3);
+                        border-radius: 50%;
+                        left: ${Math.random() * 100}%;
+                        top: ${Math.random() * 100}%;
+                        animation: floatUp 8s linear infinite;
+                        z-index: 1;
+                    `;
+                    
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 8000);
+                }, i * 1000);
+            }
+        }
+
+        // Add floating particles CSS
+        const particleStyle = document.createElement('style');
+        particleStyle.textContent = `
+            @keyframes floatUp {
+                0% {
+                    transform: translateY(100vh) scale(0);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 1;
+                    transform: translateY(90vh) scale(1);
+                }
+                90% {
+                    opacity: 1;
+                    transform: translateY(-10vh) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-20vh) scale(0);
+                }
+            }
+        `;
+        document.head.appendChild(particleStyle);
+
+        // Start background particles
+        setInterval(createBackgroundParticles, 3000);
+        createBackgroundParticles();
+
+        // Agent card hover effects with enhanced animations
+        document.querySelectorAll('.agent-item').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-15px) rotateX(5deg)';
+                this.style.boxShadow = '0 25px 80px rgba(255, 70, 85, 0.4)';
+                
+                const agentImage = this.querySelector('.agent-image');
+                agentImage.style.transform = 'scale(1.1) rotateZ(5deg)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) rotateX(0deg)';
+                this.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.3)';
+                
+                const agentImage = this.querySelector('.agent-image');
+                agentImage.style.transform = 'scale(1) rotateZ(0deg)';
+            });
+        });
+
+        // Feature cards enhanced animations
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('.feature-icon');
+                icon.style.transform = 'scale(1.2) rotateY(180deg)';
+                icon.style.background = 'linear-gradient(135deg, #ff6b7a, #ff4655)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('.feature-icon');
+                icon.style.transform = 'scale(1) rotateY(0deg)';
+                icon.style.background = 'linear-gradient(135deg, #ff4655, #ff6b7a)';
+            });
+        });
+
+        // Enhanced button interactions
+        document.querySelectorAll('.btn-primary, .btn-secondary, .play-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+            
+            btn.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(-1px) scale(0.98)';
+            });
+            
+            btn.addEventListener('mouseup', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+        });
+
+        // Navbar scroll effect with enhanced styling
+        let lastScrollY = window.scrollY;
+        
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling down
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                // Scrolling up
+                header.style.transform = 'translateY(0)';
+            }
+            
+            // Background opacity based on scroll
+            if (currentScrollY > 50) {
+                header.style.background = `rgba(15, 20, 25, ${Math.min(0.98, 0.8 + currentScrollY / 1000)})`;
+                header.style.borderBottom = '2px solid #ff4655';
+            } else {
+                header.style.background = 'rgba(15, 20, 25, 0.95)';
+                header.style.borderBottom = '1px solid #ff4655';
+            }
+            
+            lastScrollY = currentScrollY;
+        });
+
+        // Advanced loading screen with progress
+        function enhancedLoading() {
+            const loading = document.getElementById('loading');
+            const spinner = loading.querySelector('.spinner');
+            
+            // Add progress text
+            const progressText = document.createElement('div');
+            progressText.style.cssText = `
+                color: #ff4655;
+                font-size: 1.2rem;
+                margin-top: 2rem;
+                font-weight: bold;
+                letter-spacing: 2px;
+            `;
+            progressText.textContent = 'LOADING VALORANT...';
+            loading.appendChild(progressText);
+            
+            // Simulate loading progress
+            const loadingSteps = [
+                'INITIALIZING AGENTS...',
+                'LOADING ARSENAL...',
+                'PREPARING BATTLEFIELD...',
+                'READY TO PLAY!'
+            ];
+            
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < loadingSteps.length) {
+                    progressText.textContent = loadingSteps[step];
+                    step++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 400);
+        }
+
+        // Call enhanced loading
+        enhancedLoading();
+
+        // Add typewriter effect to hero title
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.style.animation = 'glow 2s ease-in-out infinite alternate';
+                }
+            }
+            
+            type();
+        }
+
+        // Add glow animation CSS
+        const glowStyle = document.createElement('style');
+        glowStyle.textContent = `
+            @keyframes glow {
+                from { text-shadow: 0 0 10px #ff4655, 0 0 20px #ff4655, 0 0 30px #ff4655; }
+                to { text-shadow: 0 0 20px #ff4655, 0 0 30px #ff4655, 0 0 40px #ff4655; }
+            }
+        `;
+        document.head.appendChild(glowStyle);
+
+        // Start typewriter effect after loading
+        setTimeout(() => {
+            const heroTitle = document.querySelector('.hero-text h1');
+            typeWriter(heroTitle, 'DEFY THE LIMITS', 150);
+        }, 2000);
+
+        // Enhanced agent selection with sound simulation
+        function selectAgentEnhanced(agentName) {
+            // Visual feedback
+            const allCards = document.querySelectorAll('.agent-item');
+            allCards.forEach(card => {
+                card.style.filter = 'grayscale(100%) brightness(0.5)';
+                card.style.transform = 'scale(0.95)';
+            });
+            
+            // Highlight selected card
+            const selectedCard = event.currentTarget;
+            selectedCard.style.filter = 'none';
+            selectedCard.style.transform = 'scale(1.1)';
+            selectedCard.style.boxShadow = '0 0 50px #ff4655';
+            
+            // Simulate sound effect with visual cue
+            const soundWave = document.createElement('div');
+            soundWave.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 100px;
+                height: 100px;
+                border: 3px solid #ff4655;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: soundWave 1s ease-out forwards;
+                pointer-events: none;
+                z-index: 10000;
+            `;
+            
+            document.body.appendChild(soundWave);
+            
+            setTimeout(() => {
+                soundWave.remove();
+                // Reset all cards
+                allCards.forEach(card => {
+                    card.style.filter = 'none';
+                    card.style.transform = 'scale(1)';
+                    card.style.boxShadow = '';
+                });
+            }, 2000);
+        }
+
+        // Add sound wave animation
+        const soundWaveStyle = document.createElement('style');
+        soundWaveStyle.textContent = `
+            @keyframes soundWave {
+                0% {
+                    transform: translate(-50%, -50%) scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(-50%, -50%) scale(10);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(soundWaveStyle);
+
+        // Replace the original selectAgent function
+        window.selectAgent = selectAgentEnhanced;
+
+        // Add easter egg - Konami code
+        let konamiCode = [];
+        const konamiSequence = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+            'KeyB', 'KeyA'
+        ];
+
+        document.addEventListener('keydown', function(e) {
+            konamiCode.push(e.code);
+            
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (konamiCode.length === konamiSequence.length &&
+                konamiCode.every((code, index) => code === konamiSequence[index])) {
+                
+                // Easter egg activated!
+                document.body.style.animation = 'rainbow 2s linear infinite';
+                alert('🌈 KONAMI CODE ACTIVATED! RAINBOW MODE ENABLED! 🎮');
+                
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                }, 10000);
+            }
+        });
+
+        // Add rainbow animation
+        const rainbowStyle = document.createElement('style');
+        rainbowStyle.textContent = `
+            @keyframes rainbow {
+                0% { filter: hue-rotate(0deg); }
+                100% { filter: hue-rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(rainbowStyle);
+
+        // Console welcome message
+        console.log(`
+        %c██╗   ██╗ █████╗ ██╗      ██████╗ ██████╗  █████╗ ███╗   ██╗████████╗
+        %c██║   ██║██╔══██╗██║     ██╔═══██╗██╔══██╗██╔══██╗████╗  ██║╚══██╔══╝
+        %c██║   ██║███████║██║     ██║   ██║██████╔╝███████║██╔██╗ ██║   ██║   
+        %c╚██╗ ██╔╝██╔══██║██║     ██║   ██║██╔══██╗██╔══██║██║╚██╗██║   ██║   
+        %c ╚████╔╝ ██║  ██║███████╗╚██████╔╝██║  ██║██║  ██║██║ ╚████║   ██║   
+        %c  ╚═══╝  ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   
+        
+        Welcome to VALORANT Clone! 🎮
+        Try the Konami Code for a surprise! ⬆️⬆️⬇️⬇️⬅️➡️⬅️➡️BA
+        `, 
+        'color: #ff4655; font-weight: bold;',
+        'color: #ff4655; font-weight: bold;',
+        'color: #ff4655; font-weight: bold;',
+        'color: #ff4655; font-weight: bold;',
+        'color: #ff4655; font-weight: bold;',
+        'color: #ff4655; font-weight: bold;'
+        );
+    </script>
+</body>
+</html>
